@@ -112,3 +112,4 @@ staticfiles/
 # Media files
 media/gov_docs/*
 !media/gov_docs/.gitkeep
+.vercel
