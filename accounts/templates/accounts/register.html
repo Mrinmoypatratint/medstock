@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load form_extras %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="bg-white shadow rounded-xl p-6">
+    <h1 class="text-xl font-semibold mb-4">Create account</h1>
+
+    {# Show any non-field errors (e.g., validation across fields) #}
+    {% if form.non_field_errors %}
+      <div class="mb-3 rounded-md p-3 bg-red-50 text-red-700 text-sm">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {# Show per-field errors at the top too (nice for quick scan) #}
+    {% if form.errors %}
+      <div class="mb-3 rounded-md p-3 bg-amber-50 text-amber-900 text-sm">
+        <ul class="list-disc ml-5">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <li><strong>{{ field|capfirst }}</strong>: {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4" novalidate>
+      {% csrf_token %}
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Full Name</label>
+        {{ form.full_name|add_class:'w-full rounded-lg border-slate-300 focus:border-brand-500 focus:ring-brand-500' }}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Email</label>
+        {{ form.email|add_class:'w-full rounded-lg border-slate-300 focus:border-brand-500 focus:ring-brand-500' }}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Password</label>
+        {{ form.password|add_class:'w-full rounded-lg border-slate-300 focus:border-brand-500 focus:ring-brand-500' }}
+        <p class="text-xs text-slate-500 mt-1">Minimum 8 characters.</p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Phone</label>
+        {{ form.phone|add_class:'w-full rounded-lg border-slate-300 focus:border-brand-500 focus:ring-brand-500' }}
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium mb-1">Address</label>
+        {{ form.address|add_class:'w-full rounded-lg border-slate-300 focus:border-brand-500 focus:ring-brand-500' }}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Govt Medical License</label>
+        {{ form.medical_license|add_class:'w-full rounded-lg border-slate-300 focus:border-brand-500 focus:ring-brand-500' }}
+      </div>
+
+      {# Hidden username field from the ModelForm Meta (keep it present) #}
+      {{ form.username }}
+
+      <div class="md:col-span-2 flex items-center gap-3 mt-2">
+        <button type="submit" class="inline-flex rounded-lg bg-brand-600 px-4 py-2 text-white hover:bg-brand-700">
+          Create Account
+        </button>
+        <a class="text-brand-700 hover:underline" href="{% url 'accounts:login' %}">Back to login</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

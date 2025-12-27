@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold tracking-tight">All Medicines</h1>
+  <p class="text-slate-600 text-sm">View and manage your medicine inventory.</p>
+</div>
+
+<!-- Filter tabs -->
+<div class="flex flex-wrap gap-2 mb-4">
+  <a href="{% url 'inventory:medicines' %}" 
+     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors
+            {% if not status %}bg-brand-600 text-white{% else %}bg-white text-slate-700 hover:bg-slate-100{% endif %}">
+    All
+    <span class="inline-flex items-center rounded-full bg-white/20 text-xs px-2 py-0.5 {% if not status %}text-white{% else %}bg-slate-100 text-slate-600{% endif %}">
+      {{ expired_count|add:expiring_count|add:ok_count }}
+    </span>
+  </a>
+  <a href="{% url 'inventory:medicines' %}?status=expired" 
+     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors
+            {% if status == 'expired' %}bg-red-600 text-white{% else %}bg-white text-slate-700 hover:bg-red-50{% endif %}">
+    <span class="w-2 h-2 rounded-full {% if status == 'expired' %}bg-white{% else %}bg-red-500{% endif %}"></span>
+    Expired
+    <span class="inline-flex items-center rounded-full text-xs px-2 py-0.5 {% if status == 'expired' %}bg-white/20 text-white{% else %}bg-red-100 text-red-700{% endif %}">
+      {{ expired_count }}
+    </span>
+  </a>
+  <a href="{% url 'inventory:medicines' %}?status=expiring" 
+     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors
+            {% if status == 'expiring' %}bg-amber-500 text-white{% else %}bg-white text-slate-700 hover:bg-amber-50{% endif %}">
+    <span class="w-2 h-2 rounded-full {% if status == 'expiring' %}bg-white{% else %}bg-amber-500{% endif %}"></span>
+    Expiring ≤30d
+    <span class="inline-flex items-center rounded-full text-xs px-2 py-0.5 {% if status == 'expiring' %}bg-white/20 text-white{% else %}bg-amber-100 text-amber-700{% endif %}">
+      {{ expiring_count }}
+    </span>
+  </a>
+  <a href="{% url 'inventory:medicines' %}?status=ok" 
+     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors
+            {% if status == 'ok' %}bg-emerald-600 text-white{% else %}bg-white text-slate-700 hover:bg-emerald-50{% endif %}">
+    <span class="w-2 h-2 rounded-full {% if status == 'ok' %}bg-white{% else %}bg-emerald-500{% endif %}"></span>
+    OK
+    <span class="inline-flex items-center rounded-full text-xs px-2 py-0.5 {% if status == 'ok' %}bg-white/20 text-white{% else %}bg-emerald-100 text-emerald-700{% endif %}">
+      {{ ok_count }}
+    </span>
+  </a>
+</div>
+
+<!-- Search -->
+<form class="flex flex-col sm:flex-row gap-2 mb-4" method="get">
+  {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+  <input class="flex-1 rounded-lg border-slate-300 focus:border-brand-500 focus:ring-brand-500" type="search" name="q" value="{{ q }}" placeholder="Search by name or ID" />
+  <button class="inline-flex justify-center items-center rounded-lg bg-brand-600 px-4 py-2 text-white hover:bg-brand-700">Search</button>
+</form>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div id="medList" class="bg-white shadow rounded-xl divide-y max-h-[65vh] overflow-y-auto">
+    {% for m in meds %}
+    <a href="#" data-detail-url="{% url 'inventory:medicine_detail_partial' m.pk %}"
+       class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
+      <div class="min-w-0 flex-1">
+        <div class="font-medium text-slate-900 truncate">{{ m.name }}</div>
+        <div class="text-xs text-slate-500 mt-0.5">ID: {{ m.medicine_id }} · Qty: {{ m.quantity_on_hand }}</div>
+      </div>
+      <div class="ml-3 flex-shrink-0">
+        {% if m.expiry_status == 'expired' %}
+          <span class="inline-flex items-center rounded-full bg-red-100 text-red-700 text-xs px-2 py-0.5">Expired</span>
+        {% elif m.expiry_status == 'expiring' %}
+          <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-800 text-xs px-2 py-0.5">Expiring</span>
+        {% else %}
+          <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5">OK</span>
+        {% endif %}
+      </div>
+    </a>
+    {% empty %}
+    <div class="p-6 text-center">
+      <svg class="mx-auto h-12 w-12 text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      <p class="text-slate-500">No medicines found{% if status %} with status "{{ status }}"{% endif %}.</p>
+      {% if status or q %}
+        <a href="{% url 'inventory:medicines' %}" class="text-brand-700 hover:underline text-sm">Clear filters</a>
+      {% else %}
+        <a href="{% url 'inventory:records' %}" class="text-brand-700 hover:underline text-sm">Add medicines in Records →</a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div id="detailPane" class="bg-white shadow rounded-xl min-h-[240px]">
+    <div class="p-4 text-slate-500 text-center">
+      <svg class="mx-auto h-12 w-12 text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <p>Select a medicine to see details.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

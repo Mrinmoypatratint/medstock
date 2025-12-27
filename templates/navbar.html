@@ -1,0 +1,62 @@
+<nav class="sticky top-0 z-50 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75
+            border-b border-slate-200 shadow-sm">
+  
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex h-14 items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="inline-flex items-center gap-2">
+          <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-bold">M</span>
+          <span class="font-semibold text-slate-900">MedShop</span>
+        </a>
+        {% if user.is_authenticated %}
+        <div class="hidden md:flex items-center gap-1 ml-6">
+          <a href="/" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-100 {% if request.path == '/' %}bg-slate-100{% endif %}">Dashboard</a>
+          <a href="/reports/" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-100 {% if request.path|slice:':9' == '/reports/' %}bg-slate-100{% endif %}">Reports</a>
+          <a href="/records/" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-100 {% if request.path|slice:':8' == '/records' %}bg-slate-100{% endif %}">Records</a>
+          <a href="/manufacturers/" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-100 {% if request.path|slice:':15' == '/manufacturers' %}bg-slate-100{% endif %}">Manufacturers</a>
+        </div>
+        {% endif %}
+      </div>
+      
+      <!-- Desktop actions -->
+      <div class="hidden md:flex items-center gap-2">
+        {% if user.is_authenticated %}
+          <a href="/accounts/profile/" class="inline-flex items-center px-3 py-1.5 rounded-md text-sm bg-slate-100 hover:bg-slate-200">Profile</a>
+          <a href="/accounts/logout/" class="inline-flex items-center px-3 py-1.5 rounded-md text-sm bg-red-50 text-red-700 hover:bg-red-100">Logout</a>
+        {% endif %}
+      </div>
+
+      <!-- Mobile menu button -->
+      {% if user.is_authenticated %}
+      <button id="mobileMenuBtn" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none" aria-expanded="false">
+        <span class="sr-only">Open main menu</span>
+        <!-- Hamburger icon -->
+        <svg id="menuIconOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <!-- Close icon (hidden by default) -->
+        <svg id="menuIconClose" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Mobile menu panel -->
+  {% if user.is_authenticated %}
+  <div id="mobileMenu" class="md:hidden hidden border-t border-slate-200 bg-white">
+    <div class="px-4 py-3 space-y-1">
+      <a href="/" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 {% if request.path == '/' %}bg-slate-100 text-brand-700{% else %}text-slate-700{% endif %}">Dashboard</a>
+      <a href="/reports/" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 {% if request.path|slice:':9' == '/reports/' %}bg-slate-100 text-brand-700{% else %}text-slate-700{% endif %}">Reports</a>
+      <a href="/records/" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 {% if request.path|slice:':8' == '/records' %}bg-slate-100 text-brand-700{% else %}text-slate-700{% endif %}">Records</a>
+      <a href="/manufacturers/" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 {% if request.path|slice:':15' == '/manufacturers' %}bg-slate-100 text-brand-700{% else %}text-slate-700{% endif %}">Manufacturers</a>
+    </div>
+    <div class="border-t border-slate-200 px-4 py-3 space-y-1">
+      <a href="/accounts/profile/" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Profile</a>
+      <a href="/accounts/logout/" class="block px-3 py-2 rounded-md text-base font-medium text-red-700 hover:bg-red-50">Logout</a>
+    </div>
+  </div>
+  {% endif %}
+</nav>

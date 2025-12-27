@@ -1,0 +1,260 @@
+html, body { height: 100%; }
+#detailPane { min-height: 260px; }
+
+/* --- Always visible, styled inputs without needing Tailwind build --- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="date"],
+select,
+textarea {
+  border: 1px solid #cbd5e1;       /* slate-300 */
+  background: #ffffff;             /* white */
+  border-radius: 0.5rem;           /* rounded-lg */
+  padding: 0.5rem 0.75rem;         /* px-3 py-2 */
+  width: 100%;
+  min-height: 2.5rem;
+  outline: none;
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #3b82f6;           /* brand-500-ish */
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.25); /* focus:ring */
+}
+
+/* =========================================
+   RESPONSIVE UTILITIES
+   ========================================= */
+
+/* Better touch targets on mobile */
+@media (max-width: 640px) {
+  button, 
+  a.inline-flex,
+  .btn {
+    min-height: 44px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Stack form elements better on mobile */
+  .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Better spacing for mobile */
+  .p-6 {
+    padding: 1rem !important;
+  }
+  
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Larger text for readability */
+  .text-xs {
+    font-size: 0.8125rem;
+  }
+  
+  /* Better table scrolling */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  thead, tbody, tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+}
+
+/* Cards need breathing room on small screens */
+@media (max-width: 768px) {
+  .rounded-2xl {
+    border-radius: 1rem;
+  }
+  
+  /* Make the detail pane full width on mobile */
+  #detailPane {
+    min-height: 200px;
+  }
+  
+  /* Better profile card layout */
+  .profile-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+/* =========================================
+   GLOBAL APP BACKGROUND (Light + Dark Mode)
+   ========================================= */
+:root {
+  /* base color and overlays for light mode */
+  --bg-base-color: #f8fafc; /* slate-50 */
+  --bg-overlay-light: radial-gradient(1000px 800px at 10% 0%,
+      rgba(59,130,246,0.10) 0%, rgba(59,130,246,0.06) 30%, transparent 60%),
+    radial-gradient(900px 600px at 90% 100%,
+      rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.06) 35%, transparent 65%);
+  --bg-image-url: url("/static/img/abstract-bg.png");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* adjust tones for dark mode */
+    --bg-base-color: #e7e1e1; /* slate-900 */
+    --bg-overlay-light: radial-gradient(1000px 800px at 10% 0%,
+        rgba(59,130,246,0.25) 0%, rgba(59,130,246,0.15) 30%, transparent 60%),
+      radial-gradient(900px 600px at 90% 100%,
+        rgba(16,185,129,0.28) 0%, rgba(16,185,129,0.15) 35%, transparent 65%);
+  }
+}
+
+/* apply background to entire app body */
+.app-bg {
+  
+  background-image:
+    var(--bg-overlay-light),
+    var(--bg-image-url);
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+  min-height: 100vh;
+  transition: background 0.5s ease-in-out;
+}
+
+/* Optional: translucent card/surface styling */
+.surface {
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  border: 1px solid rgba(148,163,184,0.25);
+}
+@media (prefers-color-scheme: dark) {
+  .surface {
+    background: rgba(239, 244, 255, 0.65);
+    border-color: rgba(148,163,184,0.25);
+  }
+}
+
+/* =========================================
+   ANIMATION & UX IMPROVEMENTS
+   ========================================= */
+
+/* Smooth transitions for interactive elements */
+button, a, input, select, textarea {
+  transition: all 0.15s ease-in-out;
+}
+
+/* Better focus styles for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Loading state */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Skeleton loader animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.25rem;
+}
+
+/* Toast notifications */
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* =========================================
+   MOBILE-SPECIFIC IMPROVEMENTS
+   ========================================= */
+
+/* Hide scrollbar but keep scrolling */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Better mobile table display */
+@media (max-width: 640px) {
+  .mobile-card-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .mobile-card-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .mobile-card-table tbody td:last-child {
+    border-bottom: none;
+  }
+  
+  .mobile-card-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 500;
+    color: #64748b;
+  }
+  
+  .mobile-card-table thead {
+    display: none;
+  }
+}
