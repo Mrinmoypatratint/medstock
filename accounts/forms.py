@@ -97,3 +97,51 @@ class ProfileForm(forms.ModelForm):
         if f.size > 8 * 1024 * 1024:  # 8 MB
             raise forms.ValidationError("File too large (max 8 MB).")
         return f
+
+class AddEmployeeForm(forms.ModelForm):
+    full_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        help_text='Minimum 8 characters.'
+    )
+
+    class Meta:
+        model = User
+        fields = ['username']
+        widgets = {'username': forms.HiddenInput()}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].required = False
+
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Email already registered.')
+        return email
+
+    def clean_password(self):
+        pw = self.cleaned_data.get('password') or ''
+        if len(pw) < 8:
+            raise forms.ValidationError('Password must be at least 8 characters.')
+        return pw
+
+    def clean(self):
+        cleaned = super().clean()
+        email = (cleaned.get('email') or '').strip().lower()
+        cleaned['username'] = email
+        return cleaned
+
+    def save(self, commit=True, employer=None):
+        email = self.cleaned_data['email']
+        user = User(username=email, email=email)
+        user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+            profile = user.profile
+            profile.full_name = self.cleaned_data['full_name']
+            profile.role = 'EMPLOYEE'
+            profile.employer = employer
+            profile.save()
+        return user

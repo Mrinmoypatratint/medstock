@@ -106,3 +106,32 @@ def password_change_ajax(request):
         return JsonResponse({"ok": True})
     # Send field errors back to the modal
     return JsonResponse({"ok": False, "errors": form.errors}, status=400)
+
+
+@login_required
+def employee_list(request):
+    if request.user.profile.role != 'OWNER':
+        messages.error(request, 'Only shop owners can manage employees.')
+        return redirect('inventory:dashboard')
+    
+    employees = Profile.objects.filter(employer=request.user, role='EMPLOYEE')
+    return render(request, 'accounts/employee_list.html', {'employees': employees})
+
+@login_required
+def add_employee(request):
+    if request.user.profile.role != 'OWNER':
+        messages.error(request, 'Only shop owners can manage employees.')
+        return redirect('inventory:dashboard')
+    
+    from .forms import AddEmployeeForm
+    if request.method == 'POST':
+        form = AddEmployeeForm(request.POST)
+        if form.is_valid():
+            form.save(employer=request.user)
+            messages.success(request, 'Employee added successfully.')
+            return redirect('accounts:employee_list')
+    else:
+        form = AddEmployeeForm()
+        
+    return render(request, 'accounts/add_employee.html', {'form': form})
+

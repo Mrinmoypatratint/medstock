@@ -25,8 +25,8 @@ print("=" * 50)
 
 # Get or create demo user
 user, created = User.objects.get_or_create(
-    username='demo@medshop.com',
-    defaults={'email': 'demo@medshop.com'}
+    username='room214boys@gmail.com',
+    defaults={'email': 'room214boys@gmail.com'}
 )
 if created:
     user.set_password('Demo@1234')

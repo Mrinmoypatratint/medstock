@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load form_extras %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Generate Bill</h1>
+    <p class="text-slate-600 text-sm mt-0.5">Create instant customer invoices with real-time stock verification.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="{% url 'inventory:bill_list' %}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50">
+      <svg class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      Bill History
+    </a>
+  </div>
+</div>
+
+<form method="post" id="billForm" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  {% csrf_token %}
+
+  <!-- Main Section: Customer Details & Items -->
+  <div class="lg:col-span-2 space-y-6">
+
+    <!-- Customer Details Card -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100/80">
+      <h2 class="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
+        <svg class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        Customer & Payment Info
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">Customer Name <span class="text-red-500">*</span></label>
+          {{ form.customer_name|add_class:'w-full rounded-xl border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500 py-2' }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">Phone Number</label>
+          {{ form.customer_phone|add_class:'w-full rounded-xl border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500 py-2' }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">Payment Mode</label>
+          {{ form.payment_mode|add_class:'w-full rounded-xl border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500 py-2 bg-white' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Section Card -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100/80">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-slate-900 flex items-center gap-2">
+          <svg class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          Bill Line Items
+        </h2>
+        <button type="button" id="addRowBtn" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700 hover:bg-brand-100 transition">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Item
+        </button>
+      </div>
+
+      <!-- Items Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm" id="itemsTable">
+          <thead>
+            <tr class="border-b border-slate-100 text-xs font-medium text-slate-500 uppercase tracking-wider">
+              <th class="pb-3 pr-2 min-w-[220px]">Medicine</th>
+              <th class="pb-3 px-2 w-28 text-center">Qty</th>
+              <th class="pb-3 px-2 w-32 text-right">Unit Price (₹)</th>
+              <th class="pb-3 px-2 w-32 text-right">Total (₹)</th>
+              <th class="pb-3 pl-2 w-10 text-center"></th>
+            </tr>
+          </thead>
+          <tbody id="itemsTbody" class="divide-y divide-slate-100">
+            <!-- Dynamic item rows inserted via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty Cart Helper State -->
+      <div id="emptyItemsState" class="hidden text-center py-8 text-slate-400">
+        <svg class="mx-auto h-10 w-10 text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <p class="text-sm">No items added to bill yet.</p>
+        <button type="button" onclick="addItemRow()" class="mt-2 text-xs font-semibold text-brand-600 hover:underline">+ Click here to add your first item</button>
+      </div>
+
+      <!-- Additional Notes -->
+      <div class="mt-6 pt-4 border-t border-slate-100">
+        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Remarks / Doctor Notes (Optional)</label>
+        {{ form.notes|add_class:'w-full rounded-xl border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500' }}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sidebar: Billing Summary Card -->
+  <div class="space-y-6">
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100/80 sticky top-20">
+      <h2 class="text-base font-semibold text-slate-900 mb-4 pb-3 border-b border-slate-100">Payment Summary</h2>
+
+      <div class="space-y-3.5 text-sm">
+        <div class="flex items-center justify-between text-slate-600">
+          <span>Subtotal</span>
+          <span id="summarySubtotal" class="font-semibold text-slate-900">₹0.00</span>
+        </div>
+
+        <div class="flex items-center justify-between gap-2">
+          <label for="id_tax_percentage" class="text-slate-600 text-xs font-medium">GST / Tax (%)</label>
+          <div class="w-28">
+            {{ form.tax_percentage|add_class:'w-full rounded-lg border-slate-200 text-sm text-right focus:border-brand-500 py-1' }}
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-slate-600 text-xs">
+          <span>Tax Amount</span>
+          <span id="summaryTax" class="font-medium text-slate-700">₹0.00</span>
+        </div>
+
+        <div class="flex items-center justify-between gap-2">
+          <label for="id_discount_amount" class="text-slate-600 text-xs font-medium">Discount (₹)</label>
+          <div class="w-28">
+            {{ form.discount_amount|add_class:'w-full rounded-lg border-slate-200 text-sm text-right focus:border-brand-500 py-1' }}
+          </div>
+        </div>
+
+        <hr class="border-slate-100 my-2">
+
+        <div class="flex items-center justify-between py-2 text-base font-bold text-slate-900">
+          <span>Grand Total</span>
+          <span id="summaryTotal" class="text-xl text-brand-600">₹0.00</span>
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-2">
+        <button type="submit" id="submitBillBtn" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-brand-600/20 hover:from-brand-700 hover:to-cyan-700 transition">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          Complete & Generate Bill
+        </button>
+
+        <a href="{% url 'inventory:generate_bill' %}" class="block text-center text-xs text-slate-500 hover:text-slate-700 py-2 font-medium">Clear & Reset Form</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Medicine Data Store for JavaScript -->
+<script id="medicineData" type="application/json">
+[
+  {% for m in medicines %}
+  {
+    "id": {{ m.id }},
+    "name": "{{ m.name|escapejs }}",
+    "code": "{{ m.medicine_id|escapejs }}",
+    "mrp": "{{ m.mrp }}",
+    "stock": {{ m.quantity_on_hand }}
+  }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+]
+</script>
+
+<script>
+(function() {
+  const medicineData = JSON.parse(document.getElementById('medicineData').textContent || '[]');
+  const tbody = document.getElementById('itemsTbody');
+  const emptyState = document.getElementById('emptyItemsState');
+
+  function updateCalculations() {
+    let subtotal = 0;
+
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach(row => {
+      const select = row.querySelector('.med-select');
+      const qtyInput = row.querySelector('.qty-input');
+      const priceInput = row.querySelector('.price-input');
+      const totalSpan = row.querySelector('.row-total');
+      const stockBadge = row.querySelector('.stock-badge');
+
+      const selectedId = parseInt(select.value);
+      const med = medicineData.find(m => m.id === selectedId);
+
+      const qty = parseFloat(qtyInput.value) || 0;
+      const price = parseFloat(priceInput.value) || 0;
+      const rowTotal = qty * price;
+
+      subtotal += rowTotal;
+      totalSpan.textContent = '₹' + rowTotal.toFixed(2);
+
+      if (med) {
+        if (qty > med.stock) {
+          stockBadge.className = 'stock-badge text-[10px] font-semibold text-red-600 block mt-0.5';
+          stockBadge.textContent = `Warning: Only ${med.stock} in stock!`;
+        } else if (med.stock === 0) {
+          stockBadge.className = 'stock-badge text-[10px] font-semibold text-red-600 block mt-0.5';
+          stockBadge.textContent = 'Out of Stock';
+        } else {
+          stockBadge.className = 'stock-badge text-[10px] text-slate-500 block mt-0.5';
+          stockBadge.textContent = `Stock: ${med.stock} units`;
+        }
+      } else {
+        stockBadge.textContent = '';
+      }
+    });
+
+    const taxPct = parseFloat(document.getElementById('id_tax_percentage').value) || 0;
+    const discount = parseFloat(document.getElementById('id_discount_amount').value) || 0;
+
+    const taxAmt = (subtotal * taxPct) / 100;
+    const grandTotal = Math.max(0, subtotal + taxAmt - discount);
+
+    document.getElementById('summarySubtotal').textContent = '₹' + subtotal.toFixed(2);
+    document.getElementById('summaryTax').textContent = '₹' + taxAmt.toFixed(2);
+    document.getElementById('summaryTotal').textContent = '₹' + grandTotal.toFixed(2);
+
+    if (rows.length === 0) {
+      emptyState.classList.remove('hidden');
+    } else {
+      emptyState.classList.add('hidden');
+    }
+  }
+
+  window.addItemRow = function() {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-slate-50/50 transition';
+
+    let optionsHtml = '<option value="">-- Select Medicine --</option>';
+    medicineData.forEach(m => {
+      optionsHtml += `<option value="${m.id}" data-mrp="${m.mrp}" data-stock="${m.stock}">${m.name} (${m.code}) - MRP: ₹${m.mrp} [In Stock: ${m.stock}]</option>`;
+    });
+
+    tr.innerHTML = `
+      <td class="py-3 pr-2">
+        <select name="medicine_id[]" class="med-select w-full rounded-lg border-slate-200 text-sm focus:border-brand-500 py-1.5 bg-white" required>
+          ${optionsHtml}
+        </select>
+        <span class="stock-badge"></span>
+      </td>
+      <td class="py-3 px-2">
+        <input type="number" name="quantity[]" value="1" min="1" class="qty-input w-full rounded-lg border-slate-200 text-sm text-center focus:border-brand-500 py-1.5" required>
+      </td>
+      <td class="py-3 px-2">
+        <input type="number" step="0.01" name="unit_price[]" value="0.00" class="price-input w-full rounded-lg border-slate-200 text-sm text-right focus:border-brand-500 py-1.5" required>
+      </td>
+      <td class="py-3 px-2 text-right font-semibold text-slate-900">
+        <span class="row-total">₹0.00</span>
+      </td>
+      <td class="py-3 pl-2 text-center">
+        <button type="button" class="remove-row-btn text-slate-400 hover:text-red-600 transition p-1">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+
+    const select = tr.querySelector('.med-select');
+    const priceInput = tr.querySelector('.price-input');
+
+    select.addEventListener('change', function() {
+      const selectedOpt = select.options[select.selectedIndex];
+      if (selectedOpt && selectedOpt.dataset.mrp) {
+        priceInput.value = parseFloat(selectedOpt.dataset.mrp).toFixed(2);
+      }
+      updateCalculations();
+    });
+
+    tr.querySelector('.remove-row-btn').addEventListener('click', function() {
+      tr.remove();
+      updateCalculations();
+    });
+
+    updateCalculations();
+  };
+
+  document.getElementById('addRowBtn').addEventListener('click', addItemRow);
+  tbody.addEventListener('input', updateCalculations);
+  document.getElementById('id_tax_percentage').addEventListener('input', updateCalculations);
+  document.getElementById('id_discount_amount').addEventListener('input', updateCalculations);
+
+  // Add initial row on page load
+  addItemRow();
+})();
+</script>
+{% endblock %}

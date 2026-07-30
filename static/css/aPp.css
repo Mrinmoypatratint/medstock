@@ -1,5 +1,56 @@
 html, body { height: 100%; }
+body { overflow-x: hidden; }
 #detailPane { min-height: 260px; }
+
+.page-shell { position: relative; }
+.page-shell::before {
+  content: "";
+  position: absolute;
+  inset: -2rem -1rem auto;
+  height: 10rem;
+  background: radial-gradient(circle at top left, rgba(14, 165, 233, 0.15), transparent 55%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.95) 0%, rgba(14, 165, 233, 0.95) 45%, rgba(20, 184, 166, 0.92) 100%);
+  color: white;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.16);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.soft-ring {
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 9999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.18);
+}
 
 /* --- Always visible, styled inputs without needing Tailwind build --- */
 input[type="text"],
@@ -23,8 +74,8 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #3b82f6;           /* brand-500-ish */
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.25); /* focus:ring */
+  border-color: #0ea5e9;           /* brand-500 */
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.25); /* focus:ring */
 }
 
 /* =========================================
@@ -100,20 +151,20 @@ textarea:focus {
   /* base color and overlays for light mode */
   --bg-base-color: #f8fafc; /* slate-50 */
   --bg-overlay-light: radial-gradient(1000px 800px at 10% 0%,
-      rgba(59,130,246,0.10) 0%, rgba(59,130,246,0.06) 30%, transparent 60%),
+      rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.04) 30%, transparent 60%),
     radial-gradient(900px 600px at 90% 100%,
-      rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.06) 35%, transparent 65%);
+      rgba(20,184,166,0.08) 0%, rgba(20,184,166,0.04) 35%, transparent 65%);
   --bg-image-url: url("/static/img/abstract-bg.png");
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     /* adjust tones for dark mode */
-    --bg-base-color: #e7e1e1; /* slate-900 */
+    --bg-base-color: #0f172a; /* slate-900 */
     --bg-overlay-light: radial-gradient(1000px 800px at 10% 0%,
-        rgba(59,130,246,0.25) 0%, rgba(59,130,246,0.15) 30%, transparent 60%),
+        rgba(14,165,233,0.20) 0%, rgba(14,165,233,0.10) 30%, transparent 60%),
       radial-gradient(900px 600px at 90% 100%,
-        rgba(16,185,129,0.28) 0%, rgba(16,185,129,0.15) 35%, transparent 65%);
+        rgba(20,184,166,0.20) 0%, rgba(20,184,166,0.10) 35%, transparent 65%);
   }
 }
 
@@ -160,7 +211,7 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #0ea5e9;
   outline-offset: 2px;
 }
 

@@ -61,3 +61,45 @@ class Transaction(models.Model):
     @property
     def total_amount(self):
         return self.unit_price * self.quantity
+
+
+class Bill(models.Model):
+    PAYMENT_CHOICES = [
+        ('CASH', 'Cash'),
+        ('CARD', 'Card'),
+        ('UPI', 'UPI / Online'),
+        ('OTHER', 'Other'),
+    ]
+
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bills')
+    billed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='bills_created')
+    billed_by_name = models.CharField(max_length=150, blank=True)
+    bill_number = models.CharField(max_length=50, unique=True)
+    customer_name = models.CharField(max_length=150)
+    customer_phone = models.CharField(max_length=20, blank=True)
+    payment_mode = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='CASH')
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    tax_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.bill_number} - {self.customer_name}"
+
+
+class BillItem(models.Model):
+    bill = models.ForeignKey(Bill, on_delete=models.CASCADE, related_name='items')
+    medicine = models.ForeignKey(Medicine, on_delete=models.PROTECT, related_name='bill_items')
+    quantity = models.PositiveIntegerField()
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.medicine.name} x {self.quantity} (Bill #{self.bill.bill_number})"
+

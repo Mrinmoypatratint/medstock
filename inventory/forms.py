@@ -1,5 +1,5 @@
 from django import forms
-from .models import Medicine, Transaction, Manufacturer
+from .models import Medicine, Transaction, Manufacturer, Bill
 
 class MedicineForm(forms.ModelForm):
     class Meta:
@@ -56,3 +56,18 @@ class ManufacturerForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
+
+
+class BillForm(forms.ModelForm):
+    class Meta:
+        model = Bill
+        fields = ['customer_name', 'customer_phone', 'payment_mode', 'tax_percentage', 'discount_amount', 'notes']
+        widgets = {
+            'customer_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Customer Name'}),
+            'customer_phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number (Optional)'}),
+            'payment_mode': forms.Select(attrs={'class': 'form-select'}),
+            'tax_percentage': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'value': '0.00'}),
+            'discount_amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'value': '0.00'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Additional notes...'}),
+        }
+

@@ -9,7 +9,8 @@ urlpatterns = [
     # App routes
     path("", include(("inventory.urls", "inventory"), namespace="inventory")),
     path("reports/", include(("reports.urls", "reports"), namespace="reports")),
-    path("accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),  # <-- namespace it
+    path("accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    path("accounts/", include("django.contrib.auth.urls")),  # <-- adds password reset views
 ]
 
 if settings.DEBUG:

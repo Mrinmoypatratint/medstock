@@ -10,4 +10,6 @@ urlpatterns = [
     path("profile/", views.profile_view, name="profile"),
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("password/change/", views.password_change_ajax, name="password_change_ajax"),
+    path("employees/", views.employee_list, name="employee_list"),
+    path("employees/add/", views.add_employee, name="add_employee"),
 ]

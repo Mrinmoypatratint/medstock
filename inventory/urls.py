@@ -18,5 +18,14 @@ urlpatterns = [
     # Pages
     path("records/", views.records, name="records"),
     path("manufacturers/", views.manufacturers, name="manufacturers"),
+
+    # Billing
+    path("billing/", views.generate_bill, name="generate_bill"),
+    path("bills/", views.bill_list, name="bill_list"),
+    path("bill/<int:pk>/", views.bill_detail, name="bill_detail"),
+
+    # AI Chat API
+    path("api/ai-chat/", views.ai_chat_api, name="ai_chat_api"),
 ]
+
 
