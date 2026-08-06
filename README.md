@@ -12,10 +12,8 @@ A modern, responsive inventory management system designed for medical shops and 
 
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
-- [Installation & Setup](#-installation--setup)
-- [Demo Credentials](#-demo-credentials)
-- [Project Architecture](#-project-architecture)
-- [API Endpoints](#-api-endpoints)
+- [Installation & Setup](setup.md)
+- [Documentation](documentation.md)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -56,15 +54,22 @@ A modern, responsive inventory management system designed for medical shops and 
 
 ---
 
-## 🚀 Installation & Setup
+## 🚀 Getting Started
 
-### Prerequisites
-- Python `3.10+`
-- `pip` package manager
-- `git`
+Please see the [Installation & Setup Guide](setup.md) for detailed instructions on how to get the project running locally.
 
-### 1. Clone & Navigate
-```bash
-git clone [https://github.com/yourusername/medshop-tracker.git](https://github.com/yourusername/medshop-tracker.git)
-cd medshop-
+## 📚 Documentation
 
+For information on project architecture, core features, and demo credentials, please refer to the [Documentation](documentation.md).
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please feel free to submit a Pull Request.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
